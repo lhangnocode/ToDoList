@@ -36,10 +36,35 @@ h1 {
     text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
 }
 
+/* Nút hủy chỉnh sửa */
+.cancel-btn {
+    padding: 15px 20px;
+    background: linear-gradient(to right, #ff7675, #fab1a0);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s;
+    margin-left: 5px;
+}
+
+.cancel-btn:hover {
+    background: linear-gradient(to right, #ff6b6b, #fa9e8b);
+    transform: translateX(2px);
+}
+
+/* Tạo layout flex cho input group để chứa thêm nút hủy */
 .input-group {
     display: flex;
     margin-bottom: 25px;
+    flex-wrap: nowrap;
 }
+/* .input-group {
+    display: flex;
+    margin-bottom: 25px;
+} */
 
 #task-input {
     flex: 1;
@@ -127,11 +152,66 @@ h1 {
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     transition: all 0.3s;
+    position: relative;
+    z-index: 1;
+    /* Thêm thuộc tính này để tránh nhảy layout */
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
 }
 
 .todo-item:hover {
     box-shadow: 0 5px 15px rgba(0,0,0,0.08);
     transform: translateY(-2px);
+}
+
+.todo-item.dragging {
+    opacity: 0.8;
+    cursor: grabbing;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.drop-area {
+    height: 60px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    background-color: rgba(108, 92, 231, 0.1);
+    border: 2px dashed #6c5ce7;
+    transition: all 0.2s;
+}
+
+.drag-handle {
+    cursor: grab;
+    margin-right: 10px;
+    color: #b2bec3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    touch-action: none; /* Ngăn chặn hành vi cuộn mặc định trên thiết bị cảm ứng */
+}
+
+.drag-handle:hover {
+    color: #6c5ce7;
+    background-color: rgba(108, 92, 231, 0.1);
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+/* Tối ưu animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translate3d(0, -15px, 0); }
+    to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* Thêm hỗ trợ thiết bị cảm ứng */
+@media (pointer: coarse) {
+    .drag-handle {
+        padding: 8px; /* Vùng chạm lớn hơn cho thiết bị cảm ứng */
+    }
 }
 
 @keyframes fadeIn {
