@@ -17,7 +17,7 @@ body {
 
 .container {
     width: 100%;
-    max-width: 550px;
+    max-width: 750px; /* Tăng chiều rộng tối đa từ 550px lên 750px */
     background-color: rgba(255, 255, 255, 0.95);
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -142,8 +142,8 @@ h1 {
 }
 
 .todo-item {
-    display: flex;
-    align-items: center;
+    display: block; /* Đổi từ flex sang block để các phần tử con xếp dọc */
+    position: relative;
     padding: 15px;
     border-bottom: 1px solid #eee;
     animation: fadeIn 0.4s ease;
@@ -152,31 +152,16 @@ h1 {
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     transition: all 0.3s;
-    position: relative;
     z-index: 1;
-    /* Thêm thuộc tính này để tránh nhảy layout */
     transform: translate3d(0, 0, 0);
     will-change: transform;
 }
 
-.todo-item:hover {
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-    transform: translateY(-2px);
-}
-
-.todo-item.dragging {
-    opacity: 0.8;
-    cursor: grabbing;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-}
-
-.drop-area {
-    height: 60px;
-    margin-bottom: 8px;
-    border-radius: 8px;
-    background-color: rgba(108, 92, 231, 0.1);
-    border: 2px dashed #6c5ce7;
-    transition: all 0.2s;
+.todo-main-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
 .drag-handle {
@@ -244,6 +229,7 @@ h1 {
     transition: all 0.3s;
     color: #2d3436;
     padding: 3px 0;
+    white-space: pre-line;
 }
 
 .completed .task-text {
@@ -330,6 +316,72 @@ h1 {
     background: linear-gradient(to right, #00a884, #4ad8b6);
     transform: scale(1.05);
     box-shadow: 0 2px 8px rgba(0, 184, 148, 0.4);
+}
+
+/* SUBTASKS UI */
+.subtask-list {
+    list-style: none;
+    padding-left: 40px; /* 1 tab ~ 40px */
+    margin: 8px 0 0 0;
+}
+.subtask-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+    background: #f7f7f7;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 0.97em;
+    transition: background 0.2s;
+}
+.subtask-item.completed span {
+    text-decoration: line-through;
+    color: #aaa;
+}
+.subtask-item input[type="checkbox"] {
+    margin-right: 8px;
+}
+.subtask-item .delete-btn {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: #e74c3c;
+    font-size: 1em;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 3px;
+    transition: background 0.2s;
+}
+.subtask-item .delete-btn:hover {
+    background: #ffeaea;
+}
+.subtask-form {
+    display: flex;
+    align-items: center;
+    margin-top: 4px;
+    margin-bottom: 8px;
+    padding-left: 40px; /* 1 tab ~ 40px */
+    gap: 4px;
+}
+.subtask-input {
+    flex: 1;
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 0.97em;
+}
+.subtask-form .add-btn {
+    background: #27ae60;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    padding: 4px 10px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.subtask-form .add-btn:hover {
+    background: #219150;
 }
 
 @media (max-width: 480px) {

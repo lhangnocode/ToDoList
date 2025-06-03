@@ -85,7 +85,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 text: taskText,
                 completed: false,
                 createdAt: new Date(),
-                order: order
+                order: order,
+                subtasks: [] // Thêm mảng subtasks
             };
             
             todos.push(newTodo);
@@ -395,48 +396,93 @@ document.addEventListener('DOMContentLoaded', function() {
             const todoItem = document.createElement('li');
             todoItem.classList.add('todo-item');
             todoItem.dataset.id = todo.id;
-            
             if (todo.completed) {
                 todoItem.classList.add('completed');
             }
-            
             if (todo.id === editingId) {
                 todoItem.classList.add('editing');
             }
-
-            // Tạo handle kéo thả
+            // Tạo dòng chính cho task
+            const mainRow = document.createElement('div');
+            mainRow.classList.add('todo-main-row');
             const dragHandle = document.createElement('div');
             dragHandle.classList.add('drag-handle');
             dragHandle.innerHTML = '<i class="fas fa-grip-vertical"></i>';
             if (!dragHandle.querySelector('i').classList.contains('fas')) {
                 dragHandle.innerHTML = '≡';
             }
-            
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.classList.add('checkbox');
             checkbox.checked = todo.completed;
             checkbox.addEventListener('change', () => toggleTodo(todo.id));
-            
             const taskText = document.createElement('span');
             taskText.classList.add('task-text');
             taskText.textContent = todo.text;
-
             const editBtn = document.createElement('button');
             editBtn.classList.add('edit-btn');
             editBtn.textContent = 'Sửa';
             editBtn.addEventListener('click', () => editTodo(todo.id));
-            
             const deleteBtn = document.createElement('button');
             deleteBtn.classList.add('delete-btn');
             deleteBtn.textContent = 'Xóa';
             deleteBtn.addEventListener('click', () => deleteTodo(todo.id));
-            
-            todoItem.appendChild(dragHandle);
-            todoItem.appendChild(checkbox);
-            todoItem.appendChild(taskText);
-            todoItem.appendChild(editBtn);
-            todoItem.appendChild(deleteBtn);
+            mainRow.appendChild(dragHandle);
+            mainRow.appendChild(checkbox);
+            mainRow.appendChild(taskText);
+            mainRow.appendChild(editBtn);
+            mainRow.appendChild(deleteBtn);
+            todoItem.appendChild(mainRow);
+            // --- SUBTASKS UI ---
+            const subtaskList = document.createElement('ul');
+            subtaskList.classList.add('subtask-list');
+            // Hiển thị các subtasks
+            if (Array.isArray(todo.subtasks)) {
+                todo.subtasks.forEach((sub, idx) => {
+                    const subItem = document.createElement('li');
+                    subItem.classList.add('subtask-item');
+                    if (sub.completed) subItem.classList.add('completed');
+                    const subCheckbox = document.createElement('input');
+                    subCheckbox.type = 'checkbox';
+                    subCheckbox.checked = sub.completed;
+                    subCheckbox.addEventListener('change', () => toggleSubtask(todo.id, idx));
+                    const subText = document.createElement('span');
+                    subText.textContent = sub.text;
+                    const subDelete = document.createElement('button');
+                    subDelete.textContent = 'X';
+                    subDelete.classList.add('delete-btn');
+                    subDelete.addEventListener('click', () => deleteSubtask(todo.id, idx));
+                    subItem.appendChild(subCheckbox);
+                    subItem.appendChild(subText);
+                    subItem.appendChild(subDelete);
+                    subtaskList.appendChild(subItem);
+                });
+            }
+            // Form thêm subtask
+            const subtaskInput = document.createElement('input');
+            subtaskInput.type = 'text';
+            subtaskInput.placeholder = 'Thêm subtask...';
+            subtaskInput.classList.add('subtask-input');
+            const subtaskAddBtn = document.createElement('button');
+            subtaskAddBtn.textContent = '+';
+            subtaskAddBtn.classList.add('add-btn');
+            subtaskAddBtn.addEventListener('click', () => {
+                addSubtask(todo.id, subtaskInput.value);
+                subtaskInput.value = '';
+            });
+            subtaskInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addSubtask(todo.id, subtaskInput.value);
+                    subtaskInput.value = '';
+                }
+            });
+            const subtaskForm = document.createElement('div');
+            subtaskForm.classList.add('subtask-form');
+            subtaskForm.appendChild(subtaskInput);
+            subtaskForm.appendChild(subtaskAddBtn);
+            todoItem.appendChild(subtaskList);
+            todoItem.appendChild(subtaskForm);
+            // --- END SUBTASKS UI ---
             todoList.appendChild(todoItem);
         });
 
@@ -450,5 +496,31 @@ document.addEventListener('DOMContentLoaded', function() {
         const activeTasks = totalTasks - completedTasks;
         
         summaryElement.textContent = `Tổng số: ${totalTasks} | Hoàn thành: ${completedTasks} | Còn lại: ${activeTasks}`;
+    }
+
+    // --- SUBTASKS FUNCTIONS ---
+    function addSubtask(todoId, text) {
+        text = text.trim();
+        if (!text) return;
+        const todo = todos.find(t => t.id === todoId);
+        if (!todo) return;
+        if (!Array.isArray(todo.subtasks)) todo.subtasks = [];
+        todo.subtasks.push({ text, completed: false });
+        saveTodos();
+        renderTodos();
+    }
+    function toggleSubtask(todoId, subIdx) {
+        const todo = todos.find(t => t.id === todoId);
+        if (!todo || !todo.subtasks || !todo.subtasks[subIdx]) return;
+        todo.subtasks[subIdx].completed = !todo.subtasks[subIdx].completed;
+        saveTodos();
+        renderTodos();
+    }
+    function deleteSubtask(todoId, subIdx) {
+        const todo = todos.find(t => t.id === todoId);
+        if (!todo || !todo.subtasks) return;
+        todo.subtasks.splice(subIdx, 1);
+        saveTodos();
+        renderTodos();
     }
 });
